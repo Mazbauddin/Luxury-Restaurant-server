@@ -53,6 +53,13 @@ async function run() {
       const result = await allFoodsCollection.insertOne(newFoodItem);
       res.send(result);
     });
+    // get all food data by email
+    app.get("/addMyFoods/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { "buyer.email": email };
+      const result = await allFoodsCollection.find(query).toArray();
+      res.send(result);
+    });
 
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
