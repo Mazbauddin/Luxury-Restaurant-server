@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const port = process.env.PORT || 5000;
 
@@ -29,15 +29,24 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    const topFoodsCollection = client
+    const allFoodsCollection = client
       .db("luxuryRestaurant")
       .collection("topFoods");
 
     // Get all data top Foods data from db
     app.get("/topFoods", async (req, res) => {
-      const result = await topFoodsCollection.find().toArray();
+      const result = await allFoodsCollection.find().toArray();
       res.send(result);
     });
+
+    // get a single food data from db
+    app.get("/singleFoodItem/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await allFoodsCollection.findOne(query);
+      res.send(result);
+    });
+
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
     // Send a ping to confirm a successful connection
