@@ -47,6 +47,26 @@ async function run() {
       res.send(result);
     });
 
+    // update  work here
+    app.put("/updateFood/:id", async (req, res) => {
+      console.log(req.params.id);
+      const query = { _id: new ObjectId(req.params.id) };
+      const data = {
+        $set: {
+          food_name: req.body.food_name,
+          food_Category: req.body.food_Category,
+          food_Origin: req.body.food_Origin,
+          price: req.body.price,
+          quantity: req.body.quantity,
+          description: req.body.description,
+          image_Url: req.body.image_Url,
+        },
+      };
+      const result = await allFoodsCollection.updateOne(query, data);
+      console.log(result);
+      res.send(result);
+    });
+
     // save a food data
     app.post("/addFoodItem", async (req, res) => {
       const newFoodItem = req.body;
