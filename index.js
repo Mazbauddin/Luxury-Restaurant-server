@@ -31,10 +31,15 @@ async function run() {
   try {
     const allFoodsCollection = client
       .db("luxuryRestaurant")
-      .collection("topFoods");
+      .collection("allFood");
 
     // Get all data top Foods data from db
-    app.get("/topFoods", async (req, res) => {
+    app.get("/allFood", async (req, res) => {
+      const result = await allFoodsCollection.find().toArray();
+      res.send(result);
+    });
+    // Get all data all Foods data from db
+    app.get("/allFoods", async (req, res) => {
       const result = await allFoodsCollection.find().toArray();
       res.send(result);
     });
@@ -53,7 +58,7 @@ async function run() {
       const query = { _id: new ObjectId(req.params.id) };
       const data = {
         $set: {
-          food_name: req.body.food_name,
+          food_Name: req.body.food_Name,
           food_Category: req.body.food_Category,
           food_Origin: req.body.food_Origin,
           price: req.body.price,
