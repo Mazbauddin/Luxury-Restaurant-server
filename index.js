@@ -67,6 +67,15 @@ async function run() {
       res.send(result);
     });
 
+    // delete to the data work here
+    app.delete("/delete/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await allFoodsCollection.deleteOne(query);
+      console.log(result);
+      res.send(result);
+    });
+
     // save a food data
     app.post("/addFoodItem", async (req, res) => {
       const newFoodItem = req.body;
