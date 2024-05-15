@@ -43,6 +43,11 @@ async function run() {
       const result = await allFoodsCollection.find().toArray();
       res.send(result);
     });
+    // Get all data all Foods data from db
+    app.get("/gallery", async (req, res) => {
+      const result = await allFoodsCollection.find().toArray();
+      res.send(result);
+    });
 
     // get a single food data from db
     app.get("/singleFoodItem/:id", async (req, res) => {
@@ -51,6 +56,30 @@ async function run() {
       const result = await allFoodsCollection.findOne(query);
       res.send(result);
     });
+    // Purchase save food data
+    app.post("/purchaseFood", async (req, res) => {
+      const newFoodItem = req.body;
+      const result = await allFoodsCollection.insertOne(newFoodItem);
+      res.send(result);
+    });
+    // app.put("/purchaseFood/:id", async (req, res) => {
+    //   console.log(req.params.id);
+    //   const query = { _id: new ObjectId(req.params.id) };
+    //   const data = {
+    //     $set: {
+    //       food_Name: req.body.food_Name,
+    //       food_Category: req.body.food_Category,
+    //       food_origin: req.body.food_origin,
+    //       price: req.body.price,
+    //       quantity: req.body.quantity,
+    //       description: req.body.description,
+    //       image_Url: req.body.image_Url,
+    //     },
+    //   };
+    //   const result = await allFoodsCollection.updateOne(query, data);
+    //   console.log(result);
+    //   res.send(result);
+    // });
 
     // update  work here
     app.put("/updateFood/:id", async (req, res) => {
@@ -60,7 +89,7 @@ async function run() {
         $set: {
           food_Name: req.body.food_Name,
           food_Category: req.body.food_Category,
-          food_Origin: req.body.food_Origin,
+          food_origin: req.body.food_origin,
           price: req.body.price,
           quantity: req.body.quantity,
           description: req.body.description,
