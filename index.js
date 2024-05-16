@@ -7,12 +7,21 @@ const port = process.env.PORT || 5000;
 const app = express();
 
 const corsOptions = {
-  origin: ["http://localhost:5173", "http://localhost:5174"],
+  origin: ["http://localhost:5173", "https://luxury-restaurants.web.app/"],
   credentials: true,
   optionSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "DELETE, PUT, GET, POST");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  next();
+});
 
 app.use(express.json());
 
@@ -48,7 +57,6 @@ async function run() {
       const result = await allFoodsCollection.find().toArray();
       res.send(result);
     });
-
     // get a single food data from db
     app.get("/singleFoodItem/:id", async (req, res) => {
       const id = req.params.id;
@@ -62,24 +70,6 @@ async function run() {
       const result = await allFoodsCollection.insertOne(newFoodItem);
       res.send(result);
     });
-    // app.put("/purchaseFood/:id", async (req, res) => {
-    //   console.log(req.params.id);
-    //   const query = { _id: new ObjectId(req.params.id) };
-    //   const data = {
-    //     $set: {
-    //       food_Name: req.body.food_Name,
-    //       food_Category: req.body.food_Category,
-    //       food_origin: req.body.food_origin,
-    //       price: req.body.price,
-    //       quantity: req.body.quantity,
-    //       description: req.body.description,
-    //       image_Url: req.body.image_Url,
-    //     },
-    //   };
-    //   const result = await allFoodsCollection.updateOne(query, data);
-    //   console.log(result);
-    //   res.send(result);
-    // });
 
     // update  work here
     app.put("/updateFood/:id", async (req, res) => {
