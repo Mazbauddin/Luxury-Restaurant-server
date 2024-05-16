@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
+const jwt = require("jsonwebtoken");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const cookieParser = require("cookie-parser");
 require("dotenv").config();
 const port = process.env.PORT || 5000;
 
@@ -24,6 +26,7 @@ app.use(function (req, res, next) {
 });
 
 app.use(express.json());
+app.use(cookieParser());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.iua9cew.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
@@ -36,43 +39,73 @@ const client = new MongoClient(uri, {
   },
 });
 
+// middlewares
+const logger = async (req, res, next) => {
+  console.log("called:", req.host, req.originalUrl);
+  next();
+};
+
 async function run() {
   try {
     const allFoodsCollection = client
       .db("luxuryRestaurant")
       .collection("allFood");
 
+    // jwt
+    app.post("/jwt", logger, async (req, res) => {
+      const user = req.body;
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: "255d",
+      });
+      res
+        .cookie("token", token, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "none",
+        })
+        .send({ success: true });
+    });
+
+    //clearing Token
+    // app.post("/logout", async (req, res) => {
+    //   const user = req.body;
+    //   console.log("logging out", user);
+    //   res
+    //     .clearCookie("token", { ...cookieOptions, maxAge: 0 })
+    //     .send({ success: true });
+    // });
+
     // Get all data top Foods data from db
-    app.get("/allFood", async (req, res) => {
+    app.get("/allFood", logger, async (req, res) => {
       const result = await allFoodsCollection.find().toArray();
       res.send(result);
     });
     // Get all data all Foods data from db
-    app.get("/allFoods", async (req, res) => {
+    app.get("/allFoods", logger, async (req, res) => {
       const result = await allFoodsCollection.find().toArray();
       res.send(result);
     });
     // Get all data all Foods data from db
-    app.get("/gallery", async (req, res) => {
+    app.get("/gallery", logger, async (req, res) => {
       const result = await allFoodsCollection.find().toArray();
       res.send(result);
     });
     // get a single food data from db
-    app.get("/singleFoodItem/:id", async (req, res) => {
+    app.get("/singleFoodItem/:id", logger, async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await allFoodsCollection.findOne(query);
       res.send(result);
     });
     // Purchase save food data
-    app.post("/purchaseFood", async (req, res) => {
+    app.post("/purchaseFood", logger, async (req, res) => {
       const newFoodItem = req.body;
       const result = await allFoodsCollection.insertOne(newFoodItem);
       res.send(result);
     });
 
     // update  work here
-    app.put("/updateFood/:id", async (req, res) => {
+    app.put("/updateFood/:id", logger, async (req, res) => {
       console.log(req.params.id);
       const query = { _id: new ObjectId(req.params.id) };
       const data = {
@@ -101,13 +134,13 @@ async function run() {
     });
 
     // save a food data
-    app.post("/addFoodItem", async (req, res) => {
+    app.post("/addFoodItem", logger, async (req, res) => {
       const newFoodItem = req.body;
       const result = await allFoodsCollection.insertOne(newFoodItem);
       res.send(result);
     });
     // get all food data by email
-    app.get("/addMyFoods/:email", async (req, res) => {
+    app.get("/addMyFoods/:email", logger, async (req, res) => {
       const email = req.params.email;
       const query = { "buyer.email": email };
       const result = await allFoodsCollection.find(query).toArray();
